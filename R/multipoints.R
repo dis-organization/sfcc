@@ -12,19 +12,6 @@ multipoints_rcpp <- function(pts, objectindex = NULL, ..., gdim = "XY") {
 #' @export
 multipoints_rcpp.matrix <- function(pts, objectindex = NULL, ..., gdim = "XY") {
   coordinated_warning(pts, gdim)
-  ## Currently a LIE, this is not Rcpp at all
-  # cls <- c(gdim, "MULTIPOINT", "sfg")
-  # if (is.null(objectindex)) {
-  #   return(list(structure(pts, class = cls)))
-  # }
-  # l <- vector("list", length(objectindex) + 1)
-  # scanindex <- c(1, objectindex, nrow(pts)+1)
-  #
-  # for (i in seq_along(l)) {
-  #   l[[i]] <- structure(pts[seq(scanindex[i], scanindex[i + 1] -1 ), , drop = FALSE],
-  #                           class = cls)
-  # }
-  # l
   stopifnot(all(objectindex > 1))
   stopifnot(all(objectindex <= nrow(pts)))
   # ## zero-based
@@ -63,3 +50,22 @@ mk_sfc_MULTIPOINT.default <- function(x, objectindex = NULL,  ..., crs = NA_char
   class(g) <- c("sfc_MULTIPOINT", "sfc")
   sfc_boilerplate(g, xr, yr, crs)
 }
+
+
+#' @export
+multipoints_r_index <- function(pts, objectindex = NULL, ..., gdim = "XY") {
+  coordinated_warning(pts, gdim)
+  cls <- c(gdim, "MULTIPOINT", "sfg")
+  if (is.null(objectindex)) {
+    return(list(structure(pts, class = cls)))
+  }
+  l <- vector("list", length(objectindex) + 1)
+  scanindex <- c(1, objectindex, nrow(pts)+1)
+
+  for (i in seq_along(l)) {
+    l[[i]] <- structure(pts[seq(scanindex[i], scanindex[i + 1] -1 ), , drop = FALSE],
+                            class = cls)
+  }
+  l
+}
+

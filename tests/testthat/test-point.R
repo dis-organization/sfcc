@@ -18,10 +18,15 @@ test_that("making points works", {
 test_that("making multipoints works", {
   expect_equal(multipoints_rcpp(cbind(x, y)),
          list(st_multipoint(cbind(x, y))))
-  expect_equal(multipoints_rcpp(cbind(x, y), c(3, 8)),
-               list(st_multipoint(cbind(x, y)[1:2, ]),
+
+  ## we can't do a direct compare because sf seems to keep dimnames
+  sfccmpts <- multipoints_rcpp(cbind(x, y), c(3, 8))
+  sfmpts <- list(st_multipoint(cbind(x, y)[1:2, ]),
                st_multipoint(cbind(x, y)[3:7, ]),
-               st_multipoint(cbind(x, y)[8:10, ])))
+               st_multipoint(cbind(x, y)[8:10, ]))
+  expect_equal(length(sfccmpts), length(sfmpts))
+  expect_equal(unique(c(unclass(sfccmpts[[1]]) - unclass(sfmpts[[1]]))),
+                      0)
 
 })
 

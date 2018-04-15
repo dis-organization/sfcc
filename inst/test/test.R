@@ -16,11 +16,18 @@ benchmark(
 )
 
 
+oidx <- c(30, 1e4, 2e4, 5e4)
+
 benchmark(
-  sfcc_mpt =  mk_sfc_MULTIPOINT(m, c(30, 1e4, 2e4, 5e4), crs = 4326),
+  sfcc_mpt =  mk_sfc_MULTIPOINT(m, oidx, crs = 4326),
   sfcc_mpt2 =  mk_sfc_MULTIPOINT(m, crs = 4326),
   sf_mpt = st_sfc(st_multipoint(m))
   ,replications = 2
+)
+
+benchmark(
+  sfccp = multipoints_cpp(m, oidx),
+  sfccr = multipoints_r(m, oidx)
 )
 
 
