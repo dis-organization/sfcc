@@ -1,7 +1,12 @@
 sfc_boilerplate <- function(x, xlim, ylim, crs) {
   p4 <- NA_character_
   epss <- NA_integer_
-  if (is.integer(crs) || !is.na(as.integer(crs))) epss <- NA_integer_
+  ## sf:::print.crs won't let us have a EPSG without p4
+  ## (because we aren't supposed to not use sf ?)
+  ##if (is.integer(crs) || !is.na(as.integer(crs))) epss <- crs
+  op <- options(warn = -1)
+  if (is.integer(crs) || !is.na(as.integer(crs))) crs <- sprintf("+init=epsg:%i", crs)
+  options(op)
   if (is.character(crs)) p4 <- crs
   crslist <- structure(list(epsg = epss, proj4string = p4), class = "crs")
   attr(x, "precision") <- 0

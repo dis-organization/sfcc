@@ -1,16 +1,26 @@
 library(sf)
 library(sp)
 
-N <- 1e3
+N <- 1e5
 df <- data.frame(a = sample(letters, N, replace = TRUE),
                  lng = runif(N, -120, -100),
                  lat = runif(N, 30, 48))
 
 
+m <- cbind(df$lng, df$lat)
+library(rbenchmark)
+benchmark(
+  sfcc_pt =  mk_sfc_POINT(m, crs = 4326),
+  sf_pt = st_as_sf(df, coords = c("lng", "lat"))
+  #,replications = 2
+)
 
-system.time({
-  dcc <- mk_sfc_POINT(cbind(df$lng, df$lat), crs = 4326)
-})
+
+benchmark(
+  sfcc_mpt =  mk_sfc_MULTIPOINT(m, c(30, 1e4, 2e4, 5e4), crs = 4326),
+  sf_mpt = st_sfc(st_multipoint(m))
+  ,replications = 2
+)
 
 
 #tools::package_native_routine_registration_skeleton("../sfcc", "src/init.c",character_only = FALSE)

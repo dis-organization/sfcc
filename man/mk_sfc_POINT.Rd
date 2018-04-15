@@ -4,10 +4,14 @@
 \alias{mk_sfc_POINT}
 \title{Make vector of points}
 \usage{
-mk_sfc_POINT(x, ...)
+mk_sfc_POINT(x, crs = NA, ...)
 }
 \arguments{
 \item{x}{coordinates of points}
+
+\item{crs}{coordinate system in EPSG (integer) or proj4string}
+
+\item{...}{reserved}
 }
 \description{
 Make vector of points

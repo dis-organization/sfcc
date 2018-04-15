@@ -1,6 +1,8 @@
 #' Make points
 #'
 #' @param pts list of point vectors (assumed length 2)
+#' @param gdim geometric dimension (in `sf::st_dimension` terms)
+#' @param ... reserved
 #' @export
 points_rcpp <- function(pts, gdim = "XY", ...) {
   UseMethod("points_rcpp")
@@ -22,12 +24,15 @@ points_rcpp.list <- function(pts, gdim = "XY", ...) {
 #' Make vector of points
 #'
 #' @param x coordinates of points
+#' @param ... reserved
+#' @param crs coordinate system in EPSG (integer) or proj4string
+#'
 #' @export
-mk_sfc_POINT <- function(x, ...) {
+mk_sfc_POINT <- function(x, crs = NA, ...) {
   UseMethod("mk_sfc_POINT")
 }
 #' @export
-mk_sfc_POINT.default <- function(x, crs = NA_character_, ...) {
+mk_sfc_POINT.default <- function(x, crs = NA, ...) {
   x <- as.matrix(x)
   xr <- range(x[,1])
   yr <- range(x[,2])

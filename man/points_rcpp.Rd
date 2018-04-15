@@ -8,6 +8,10 @@ points_rcpp(pts, gdim = "XY", ...)
 }
 \arguments{
 \item{pts}{list of point vectors (assumed length 2)}
+
+\item{gdim}{geometric dimension (in `sf::st_dimension` terms)}
+
+\item{...}{reserved}
 }
 \description{
 Make points
