@@ -17,3 +17,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// multipoints_cpp
+List multipoints_cpp(NumericMatrix pts, IntegerVector scanindex, CharacterVector gdim);
+RcppExport SEXP _sfcc_multipoints_cpp(SEXP ptsSEXP, SEXP scanindexSEXP, SEXP gdimSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type pts(ptsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type scanindex(scanindexSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type gdim(gdimSEXP);
+    rcpp_result_gen = Rcpp::wrap(multipoints_cpp(pts, scanindex, gdim));
+    return rcpp_result_gen;
+END_RCPP
+}

@@ -5,3 +5,7 @@ points_cpp <- function(pts, gdim = "XY") {
     .Call(`_sfcc_points_cpp`, pts, gdim)
 }
 
+multipoints_cpp <- function(pts, scanindex = -1L, gdim = "XY") {
+    .Call(`_sfcc_multipoints_cpp`, pts, scanindex, gdim)
+}
+

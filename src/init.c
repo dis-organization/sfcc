@@ -8,10 +8,12 @@
 */
 
 /* .Call calls */
+extern SEXP _sfcc_multipoints_cpp(SEXP, SEXP, SEXP);
 extern SEXP _sfcc_points_cpp(SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_sfcc_points_cpp", (DL_FUNC) &_sfcc_points_cpp, 2},
+    {"_sfcc_multipoints_cpp", (DL_FUNC) &_sfcc_multipoints_cpp, 3},
+    {"_sfcc_points_cpp",      (DL_FUNC) &_sfcc_points_cpp,      2},
     {NULL, NULL, 0}
 };
 

@@ -1,7 +1,7 @@
 library(sf)
 library(sp)
 
-N <- 1e5
+N <- 1e6
 df <- data.frame(a = sample(letters, N, replace = TRUE),
                  lng = runif(N, -120, -100),
                  lat = runif(N, 30, 48))
@@ -18,6 +18,7 @@ benchmark(
 
 benchmark(
   sfcc_mpt =  mk_sfc_MULTIPOINT(m, c(30, 1e4, 2e4, 5e4), crs = 4326),
+  sfcc_mpt2 =  mk_sfc_MULTIPOINT(m, crs = 4326),
   sf_mpt = st_sfc(st_multipoint(m))
   ,replications = 2
 )
