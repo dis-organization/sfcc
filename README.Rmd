@@ -31,22 +31,38 @@ I wouldn't use this as-is, yet. :)
 
 This example was motivated by [this issue](https://github.com/r-spatial/sf/issues/700), trying to speed up sf creation for POINTs. 
 
+The improvement is fairly modest, so there might be a better Rcpp way to do this? 
 
 ```{r example}
-N <- 1e6
-df <- data.frame(a = sample(letters, N, replace = TRUE),
+N <- 1e5
+x <- data.frame(a = sample(letters, N, replace = TRUE),
                  lng = runif(N, -120, -100),
                  lat = runif(N, 30, 48))
+## we avoid st_sf so we can compare apples (just the sfc creation)
+sf_mk_points <- function(x, coords) {
+		classdim = sf:::getClassDim(rep(0, length(coords)), length(coords), dim, "POINT")
+		structure( lapply(split(as.vector(t(as.matrix(x[, coords]))),
+				rep(seq_len(nrow(x)), each = length(coords))),
+				## it does help to create this as a template and update in this loop
+				## but not as much as list-creation in C++
+				function(vec) structure(vec, class = classdim)),
+			n_empty = 0L, precision = 0, crs = NA_crs_,
+			bbox = structure(
+				c(xmin = min(x[[coords[1]]], na.rm = TRUE),
+				ymin = min(x[[coords[2]]], na.rm = TRUE),
+				xmax = max(x[[coords[1]]], na.rm = TRUE),
+				ymax = max(x[[coords[2]]], na.rm = TRUE)), class = "bbox"),
+			class =  c("sfc_POINT", "sfc" ))
+}
 
-
-m <- cbind(df$lng, df$lat)
+m <- cbind(x$lng, x$lat)
 library(rbenchmark)
 
 library(sf)
 benchmark(
-  sfcc_pt =  st_sf(geometry = sfcc::mk_sfc_POINT(m, crs = 4326), a = df$a),
-  sf_pt = st_as_sf(df, coords = c("lng", "lat"))
-  ,replications = 2
+  sfcc_pt =  sfcc::mk_sfc_POINT(m, crs = 4326),
+  sf_pt = sf_mk_points(x, coords = c("lng", "lat"))
+  ,replications = 10
 )
 
 ```
