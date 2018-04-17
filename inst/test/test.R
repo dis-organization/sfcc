@@ -33,19 +33,25 @@ benchmark(
 
 #tools::package_native_routine_registration_skeleton("../sfcc", "src/init.c",character_only = FALSE)
 
+N <- 1e5
+df <- data.frame(a = sample(letters, N, replace = TRUE),
+                 lng = runif(N, -120, -100),
+                 lat = runif(N, 30, 48))
 
-#system.time({
-#  df_sf <- st_as_sf(df, coords = c("lng", "lat"), crs = "+proj=longlat +datum=WGS84")
-#})
-#ptvec <- structure(c(0, 0), class = c("XY", "POINT", "sfg"))
-#ptvecfun <- function(pt) {
-#  ptvec[1:2] <- pt
-#  ptvec
-#}
-#l <- split(t(cbind(df[["lng"]], df[["lat"]])), rep(seq_len(nrow(df)), each = 2))
+library(sf)
+system.time({
+  df_sf <- st_as_sf(df, coords = c("lng", "lat"), crs = "+proj=longlat +datum=WGS84")
+})
+ptvec <- structure(c(0, 0), class = c("XY", "POINT", "sfg"))
+ptvecfun <- function(pt) {
+  ptvec[1:2] <- pt
+  ptvec
+}
 
-#system.time({
-#  dt <- tibble::tibble(a = df$a)
-#  dt[["geometry"]] <- lapply(l, ptvecfun)
-#})
+system.time({
+  l <- split(t(cbind(df[["lng"]], df[["lat"]])), rep(seq_len(nrow(df)), each = 2))
+  dt <- tibble::tibble(a = df$a)
+  dt[["geometry"]] <- st_as_sfc(lapply(l, ptvecfun))
+  dt <- st_as_sf(dt, crs = "+proj=longlat +datum=WGS84")
+})
 
