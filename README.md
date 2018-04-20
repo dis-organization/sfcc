@@ -5,7 +5,32 @@ sfcc
 
 The goal of sfcc is to provide fast and flexible creation of `sf` simple features geometries.
 
-For now it's really just for `sfc` vectors of `POINT`. There's some exploration with `MULTIPOINT` but it's no real improvement. This is directly motivated by the set-based idioms of [silicate](https://github.com/hypertidy/silicate), and the need to bypass the thorough checking done by the sf constructors.
+Originally for `sfc` vectors of `POINT`, directly motivated by the set-based idioms of [silicate](https://github.com/hypertidy/silicate), and the need to bypass the thorough checking done by the sf constructors.
+
+The design for the code is this:
+
+-   c++ function for each of POINT, MULTIPOINT, POLYGON, etc. returns a list of sfg
+-   input is matrix of coordinates (or maybe a list) and its identifier XY (XYZ, XYZM, etc)
+-   groups can be specified, object, subobject, path (equivalent to gibble)
+-   the set-based rationale is more efficient for many cases than running the st\_polygon and friends functions
+
+For example
+
+-   `points_cpp` compiles to an internal R function
+-   wrap that with a `points_rcpp` R function to ensure sanity of inputs
+-   wrap that with a `mk_sfc_POINT` R function to organize the inputs and apply the sfc scaffolding
+
+For MULTIPOLYGON
+
+-   `multipolygons_cpp` compiles to an internal R function
+-   wrap that with `multipolygons_rcpp` R function
+-   wrap that with `mk_sfc_MULTIPOLYGON`
+
+What might also work is to have a single POLYGON constructor, that *optionally* applies the sfg level classing. Then MULTIPOLYGON wrapper can call that for each of its sub objects, with "no class please" and then apply its own class at the right level. But, these things are pretty simple so a bit of duplication is also ok.
+
+It's not finalize what the best way to specify grouping is, but it's driven from silicate. (There's hopefully a flexible set of different ways to do this, including `aes(x, y, group = ..., subobject = ...)` and other basics like earcut.hpp, silicate objects, other types).
+
+For now we don't consider GEOMETRY (sfc vectors with mixed topology).
 
 Installation
 ------------
@@ -52,9 +77,49 @@ benchmark(
   ,replications = 10
 )
 #>      test replications elapsed relative user.self sys.self user.child
-#> 2   sf_pt           10  15.259   15.244    15.231    0.028          0
-#> 1 sfcc_pt           10   1.001    1.000     0.977    0.024          0
+#> 2   sf_pt           10  16.844   17.787    16.815    0.016          0
+#> 1 sfcc_pt           10   0.947    1.000     0.935    0.012          0
 #>   sys.child
 #> 2         0
 #> 1         0
+```
+
+A polygon example (motivated by `spex::polygonize`)
+
+``` r
+qm <- quadmesh::quadmesh(raster::raster(volcano), z = NULL)
+## a dummy structure to copy
+template <- structure(list(cbind(1:5, 0)),
+                      class = c("XY", "POLYGON", "sfg"))
+
+nquads <- ncol(qm$ib)
+
+idx <- rep(seq(0, nquads), each = 5L) + c(1L, 2L, 3L, 4L, 1L)
+quadgroups <- rep(seq_len(nquads), each = 5)
+idx <- rbind(qm$ib, qm$ib[1,])
+xylist <- split(c(t(qm$vb[1:2, idx])), rep(quadgroups, 2L))
+
+
+## slower code
+
+system.time({
+ l <- lapply(seq_along(xylist), function(ii) {
+   template[[1L]][] <- xylist[[ii]]
+   template
+ })
+})
+#>    user  system elapsed 
+#>   0.051   0.000   0.051
+
+
+## Rcpp code is a bit faster
+
+library(sfcc)
+## we were working with a flat vector
+xylistm <- lapply(xylist, function(v) matrix(v, ncol = 2))
+system.time(p <-  polygons_rcpp(xylistm))
+#>    user  system elapsed 
+#>   0.012   0.000   0.012
+identical(l, p)
+#> [1] TRUE
 ```

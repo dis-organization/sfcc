@@ -8,6 +8,8 @@ df <- data.frame(a = sample(letters, N, replace = TRUE),
 
 
 m <- cbind(df$lng, df$lat)
+m <- t(m)
+benchmark(points_rcpp(m), replications = 4)
 library(rbenchmark)
 benchmark(
   sfcc_pt =  mk_sfc_POINT(m, crs = 4326),

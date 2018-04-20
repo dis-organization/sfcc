@@ -30,3 +30,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// polygons_cpp
+List polygons_cpp(List data_x, CharacterVector topology, CharacterVector gdim, LogicalVector classme);
+RcppExport SEXP _sfcc_polygons_cpp(SEXP data_xSEXP, SEXP topologySEXP, SEXP gdimSEXP, SEXP classmeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type data_x(data_xSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type topology(topologySEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type gdim(gdimSEXP);
+    Rcpp::traits::input_parameter< LogicalVector >::type classme(classmeSEXP);
+    rcpp_result_gen = Rcpp::wrap(polygons_cpp(data_x, topology, gdim, classme));
+    return rcpp_result_gen;
+END_RCPP
+}

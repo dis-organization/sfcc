@@ -9,3 +9,7 @@ multipoints_cpp <- function(pts, scanindex = -1L, gdim = "XY") {
     .Call(`_sfcc_multipoints_cpp`, pts, scanindex, gdim)
 }
 
+polygons_cpp <- function(data_x, topology = "POLYGON", gdim = "XY", classme = TRUE) {
+    .Call(`_sfcc_polygons_cpp`, data_x, topology, gdim, classme)
+}
+

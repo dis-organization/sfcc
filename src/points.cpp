@@ -47,3 +47,4 @@ List multipoints_cpp(NumericMatrix pts,
   }
   return out;
 }
+
